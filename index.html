@@ -204,6 +204,9 @@
     let totalQueued = 0;
     let totalDone = 0;
 
+    const ACCEPTED_TYPES = new Set(['image/heic', 'image/heif']);
+    const ACCEPTED_EXTS = /\.(heic|heif)$/i;
+
     dropZone.addEventListener('click', () => fileInput.click());
 
     dropZone.addEventListener('dragover', (e) => {
@@ -225,18 +228,38 @@
     });
 
     function handleFiles(files) {
-      const list = Array.from(files);
+      const list = Array.from(files).filter(f => {
+        const ok = ACCEPTED_TYPES.has(f.type) || ACCEPTED_EXTS.test(f.name);
+        if (!ok) showRejected(f.name);
+        return ok;
+      });
       if (!list.length) return;
 
       totalQueued += list.length;
+      btnZip.disabled = true;
       bulkActions.style.display = totalQueued > 1 ? 'block' : 'none';
 
       list.forEach(convertFile);
     }
 
+    function showRejected(name) {
+      const card = document.createElement('div');
+      card.className = 'file-card';
+      card.innerHTML = `
+        <div class="name" title="${escHtml(name)}">${escHtml(name)}</div>
+        <div class="status error">Not a HEIC/HEIF file — skipped</div>
+      `;
+      results.prepend(card);
+    }
+
     function convertFile(file) {
       const baseName = file.name.replace(/\.(heic|heif)$/i, '');
-      const outName = baseName + '.jpg';
+      let outName = baseName + '.jpg';
+      if (outName in convertedFiles) {
+        let i = 1;
+        while (`${baseName} (${i}).jpg` in convertedFiles) i++;
+        outName = `${baseName} (${i}).jpg`;
+      }
 
       const card = document.createElement('div');
       card.className = 'file-card';
@@ -276,6 +299,7 @@
           a.download = outName;
           a.className = 'btn-download';
           a.textContent = 'Download JPG';
+          a.addEventListener('click', () => setTimeout(() => URL.revokeObjectURL(url), 10000));
           card.appendChild(a);
         })
         .catch((err) => {
