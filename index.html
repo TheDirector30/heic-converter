@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HEIC to JPG Converter</title>
-  <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js" integrity="sha384-OTofQ0MEeiSgh62havBcemCIK0gqj809wX6UA0uPISNMRnR6NZyCdGzX3SbLrgwL" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" integrity="sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG" crossorigin="anonymous"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -200,7 +200,6 @@
     const bulkActions = document.getElementById('bulk-actions');
     const btnZip = document.getElementById('btn-zip');
 
-    // Tracks completed blobs for ZIP: { filename: Blob }
     const convertedFiles = {};
     let totalQueued = 0;
     let totalDone = 0;
@@ -239,7 +238,6 @@
       const baseName = file.name.replace(/\.(heic|heif)$/i, '');
       const outName = baseName + '.jpg';
 
-      // Build card
       const card = document.createElement('div');
       card.className = 'file-card';
       card.innerHTML = `
@@ -252,7 +250,6 @@
       const bar = card.querySelector('.progress-bar');
       const status = card.querySelector('.status');
 
-      // Animate indeterminate progress until done
       let pct = 0;
       const ticker = setInterval(() => {
         pct = Math.min(pct + (Math.random() * 8), 85);
